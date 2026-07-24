@@ -1,0 +1,939 @@
+openapi: 3.1.0
+info:
+  title: KIT KP Monitor API
+  description: "Backend API untuk aplikasi Monitoring KP \u2014 KIT"
+  version: 1.0.0
+paths:
+  /api/v1/auth/register:
+    post:
+      tags:
+      - Auth
+      summary: Register
+      operationId: register_api_v1_auth_register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+              title: Req
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Login
+      operationId: login_api_v1_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/auth/logout:
+    post:
+      tags:
+      - Auth
+      summary: Logout
+      operationId: logout_api_v1_auth_logout_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - HTTPBearer: []
+  /api/v1/users/me:
+    get:
+      tags:
+      - Users
+      summary: Get Me
+      operationId: get_me_api_v1_users_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Get Me Api V1 Users Me Get
+      security:
+      - HTTPBearer: []
+    patch:
+      tags:
+      - Users
+      summary: Update Me
+      description: 'Memperbarui data profil (Nama, Divisi, Universitas, Jabatan).
+
+        Data yang tidak ingin diubah dikosongkan (null/omitted).'
+      operationId: update_me_api_v1_users_me_patch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdate'
+        required: true
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Update Me Api V1 Users Me Patch
+        '404':
+          description: User not found
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/users/me/avatar:
+    post:
+      tags:
+      - Users
+      summary: Update My Avatar
+      description: Mengunggah dan memperbarui foto profil (avatar) pengguna.
+      operationId: update_my_avatar_api_v1_users_me_avatar_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_update_my_avatar_api_v1_users_me_avatar_post'
+        required: true
+      responses:
+        '200':
+          description: Avatar updated successfully
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Update My Avatar Api V1 Users Me Avatar Post
+        '400':
+          description: No file provided
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/attendance/register-face:
+    post:
+      tags:
+      - Attendance
+      summary: Register Face
+      description: 'Mendaftarkan wajah mahasiswa untuk absensi.
+
+        Kirim file gambar wajah (ideal close-up) melalui form-data.'
+      operationId: register_face_api_v1_attendance_register_face_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_register_face_api_v1_attendance_register_face_post'
+        required: true
+      responses:
+        '200':
+          description: Wajah berhasil didaftarkan
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Register Face Api V1 Attendance Register Face Post
+        '400':
+          description: Gambar tidak valid atau wajah tidak ditemukan
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/attendance/check-in:
+    post:
+      tags:
+      - Attendance
+      summary: Check In
+      description: Melakukan absensi Datang dengan mengirimkan foto wajah (real-time).
+      operationId: check_in_api_v1_attendance_check_in_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_check_in_api_v1_attendance_check_in_post'
+        required: true
+      responses:
+        '200':
+          description: Absensi datang berhasil
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Check In Api V1 Attendance Check In Post
+        '400':
+          description: Wajah tidak cocok, belum registrasi, atau sudah absen
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/attendance/check-out:
+    post:
+      tags:
+      - Attendance
+      summary: Check Out
+      description: Melakukan absensi Pulang dengan mengirimkan foto wajah (real-time).
+      operationId: check_out_api_v1_attendance_check_out_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_check_out_api_v1_attendance_check_out_post'
+        required: true
+      responses:
+        '200':
+          description: Absensi pulang berhasil
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Check Out Api V1 Attendance Check Out Post
+        '400':
+          description: Wajah tidak cocok, belum registrasi, atau sudah absen
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/attendance:
+    get:
+      tags:
+      - Attendance
+      summary: Get Attendances
+      description: 'Mendapatkan data absensi (Datang & Pulang) mahasiswa pada tanggal
+        tertentu.
+
+        Jika tidak ada tanggal yang dikirim, maka akan otomatis menggunakan tanggal
+        hari ini.'
+      operationId: get_attendances_api_v1_attendance_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Format YYYY-MM-DD. Jika kosong menggunakan hari ini.
+          title: Date
+        description: Format YYYY-MM-DD. Jika kosong menggunakan hari ini.
+      responses:
+        '200':
+          description: Berhasil mendapatkan data absensi
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Get Attendances Api V1 Attendance Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/tasks:
+    get:
+      tags:
+      - Tasks
+      summary: Get Tasks
+      description: 'Mendapatkan daftar tugas harian milik mahasiswa.
+
+        Filter status dan tanggal H-3 s.d. H+3.'
+      operationId: get_tasks_api_v1_tasks_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          description: 'Filter status: all, done, todo, inprogress'
+          default: all
+          title: Status
+        description: 'Filter status: all, done, todo, inprogress'
+      - name: date_filter
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Rentang tanggal H-3 sampai H+3, opsional
+          title: Date Filter
+        description: Rentang tanggal H-3 sampai H+3, opsional
+      responses:
+        '200':
+          description: Berhasil mendapatkan daftar tugas
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Get Tasks Api V1 Tasks Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Tasks
+      summary: Create Task
+      description: 'Membuat tugas baru.
+
+        Mendukung upload foto (opsional) menggunakan form-data.'
+      operationId: create_task_api_v1_tasks_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_create_task_api_v1_tasks_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Create Task Api V1 Tasks Post
+        '201':
+          description: Berhasil membuat tugas
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/tasks/{task_id}:
+    put:
+      tags:
+      - Tasks
+      summary: Update Task
+      description: Memperbarui informasi tugas (Judul, deskripsi, status, dll).
+      operationId: update_task_api_v1_tasks__task_id__put
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Update Task Api V1 Tasks  Task Id  Put
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Tasks
+      summary: Delete Task
+      description: Menghapus tugas harian (soft delete).
+      operationId: delete_task_api_v1_tasks__task_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Delete Task Api V1 Tasks  Task Id  Delete
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/tasks/{task_id}/progress:
+    post:
+      tags:
+      - Tasks
+      summary: Add Progress Note
+      description: Menambahkan catatan progres (progress note) ke tugas harian tertentu.
+      operationId: add_progress_note_api_v1_tasks__task_id__progress_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskProgressNoteCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Add Progress Note Api V1 Tasks  Task Id  Progress
+                  Post
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/tasks/{task_id}/photos:
+    post:
+      tags:
+      - Tasks
+      summary: Add Task Photo
+      description: Menambahkan lampiran foto ke tugas harian.
+      operationId: add_task_photo_api_v1_tasks__task_id__photos_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Task Id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_add_task_photo_api_v1_tasks__task_id__photos_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Add Task Photo Api V1 Tasks  Task Id  Photos Post
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/reports/daily:
+    get:
+      tags:
+      - Reports
+      summary: Get Daily Reports
+      description: Mendapatkan laporan harian.
+      operationId: get_daily_reports_api_v1_reports_daily_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Tanggal filter (opsional). Akan melimit data otomatis 50 terbaru
+            dan mencari H-3 s.d H+3
+          title: Date
+        description: Tanggal filter (opsional). Akan melimit data otomatis 50 terbaru
+          dan mencari H-3 s.d H+3
+      responses:
+        '200':
+          description: Daftar laporan harian
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Get Daily Reports Api V1 Reports Daily Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Reports
+      summary: Create Daily Report
+      description: Membuat laporan harian.
+      operationId: create_daily_report_api_v1_reports_daily_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DailyReportCreateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Create Daily Report Api V1 Reports Daily Post
+        '201':
+          description: Laporan berhasil dibuat
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/reports/weekly:
+    get:
+      tags:
+      - Reports
+      summary: Get Weekly Reports
+      description: Mendapatkan laporan mingguan.
+      operationId: get_weekly_reports_api_v1_reports_weekly_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Tanggal filter (berdasarkan date picker kalender).
+          title: Date
+        description: Tanggal filter (berdasarkan date picker kalender).
+      responses:
+        '200':
+          description: Daftar laporan mingguan
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Get Weekly Reports Api V1 Reports Weekly Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Reports
+      summary: Upload Weekly Report
+      description: Mengunggah laporan mingguan (Hanya PDF).
+      operationId: upload_weekly_report_api_v1_reports_weekly_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_weekly_report_api_v1_reports_weekly_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Upload Weekly Report Api V1 Reports Weekly Post
+        '201':
+          description: Laporan mingguan berhasil diupload
+        '400':
+          description: Format tidak valid atau laporan sudah ada
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /:
+    get:
+      summary: Root
+      operationId: root__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    Body_add_task_photo_api_v1_tasks__task_id__photos_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_add_task_photo_api_v1_tasks__task_id__photos_post
+    Body_check_in_api_v1_attendance_check_in_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_check_in_api_v1_attendance_check_in_post
+    Body_check_out_api_v1_attendance_check_out_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_check_out_api_v1_attendance_check_out_post
+    Body_create_task_api_v1_tasks_post:
+      properties:
+        title:
+          type: string
+          title: Title
+        description:
+          type: string
+          title: Description
+        status:
+          type: string
+          title: Status
+        task_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Task Date
+        file:
+          anyOf:
+          - type: string
+            contentMediaType: application/octet-stream
+          - type: 'null'
+          title: File
+      type: object
+      required:
+      - title
+      - description
+      - status
+      title: Body_create_task_api_v1_tasks_post
+    Body_register_face_api_v1_attendance_register_face_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_register_face_api_v1_attendance_register_face_post
+    Body_update_my_avatar_api_v1_users_me_avatar_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_update_my_avatar_api_v1_users_me_avatar_post
+    Body_upload_weekly_report_api_v1_reports_weekly_post:
+      properties:
+        date:
+          type: string
+          title: Date
+          description: Tanggal yang dipilih dari UI Kalender
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+          description: File PDF laporan mingguan
+      type: object
+      required:
+      - date
+      - file
+      title: Body_upload_weekly_report_api_v1_reports_weekly_post
+    DailyReportCreateRequest:
+      properties:
+        activity:
+          type: string
+          title: Activity
+        obstacle:
+          type: string
+          title: Obstacle
+        tomorrow_plan:
+          type: string
+          title: Tomorrow Plan
+        report_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Report Date
+        task_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Task Id
+      type: object
+      required:
+      - activity
+      - obstacle
+      - tomorrow_plan
+      title: DailyReportCreateRequest
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    LoginRequest:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+      - email
+      - password
+      title: LoginRequest
+    LoginResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+          default: success
+        data:
+          $ref: '#/components/schemas/LoginResponseData'
+      type: object
+      required:
+      - data
+      title: LoginResponse
+    LoginResponseData:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        token_type:
+          type: string
+          title: Token Type
+          default: bearer
+        expires_in:
+          type: integer
+          title: Expires In
+        user:
+          $ref: '#/components/schemas/UserResponse'
+      type: object
+      required:
+      - access_token
+      - expires_in
+      - user
+      title: LoginResponseData
+    TaskProgressNoteCreate:
+      properties:
+        note:
+          type: string
+          title: Note
+      type: object
+      required:
+      - note
+      title: TaskProgressNoteCreate
+    TaskUpdateRequest:
+      properties:
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        status:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+        task_date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Task Date
+      type: object
+      title: TaskUpdateRequest
+    UserProfileUpdate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        divisi:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Divisi
+        universitas:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Universitas
+        jabatan:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Jabatan
+      type: object
+      title: UserProfileUpdate
+    UserResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        email:
+          type: string
+          title: Email
+        role:
+          type: string
+          title: Role
+      type: object
+      required:
+      - id
+      - email
+      - role
+      title: UserResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
