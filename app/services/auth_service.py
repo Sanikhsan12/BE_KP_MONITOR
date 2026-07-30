@@ -42,7 +42,7 @@ class AuthService:
         await self.user_repo.create_mahasiswa_profile(profile)
         await self.user_repo.commit()
         
-        return {"id": str(user_id), "email": new_user.email, "role": new_user.role}
+        return {"id": str(user_id), "name": new_user.name, "email": new_user.email, "role": new_user.role}
 
     async def register_mentor(self, req: RegisterMentorRequest):
         existing_user = await self.user_repo.get_user_by_email(req.email)
@@ -73,7 +73,7 @@ class AuthService:
         await self.user_repo.create_mentor_profile(profile)
         await self.user_repo.commit()
         
-        return {"id": str(user_id), "email": new_user.email, "role": new_user.role}
+        return {"id": str(user_id), "name": new_user.name, "email": new_user.email, "role": new_user.role}
 
     async def login(self, req: LoginRequest):
         user = await self.user_repo.get_user_by_email(req.email)
@@ -89,6 +89,7 @@ class AuthService:
             "user": {
                 "id": str(user.id),
                 "name": user.name,
+                "email": user.email,
                 "role": user.role
             }
         }

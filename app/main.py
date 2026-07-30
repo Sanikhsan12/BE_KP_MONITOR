@@ -4,6 +4,11 @@ from app.api.v1.router import api_router
 from fastapi.staticfiles import StaticFiles
 import os
 
+from app.db.session import engine
+from app.db.base import Base
+# Import all models so metadata is registered
+from app.models import *
+
 app = FastAPI(
     title=settings.app_name,
     description="Backend API untuk aplikasi Monitoring KP — KIT",
@@ -11,6 +16,11 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+@app.on_event("startup")
+async def startup_event():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 app.include_router(api_router, prefix=settings.api_v1_prefix)
 
