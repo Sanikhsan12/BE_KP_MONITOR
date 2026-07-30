@@ -77,3 +77,5 @@ uploads/
 # non public
 planning_be/
 revisian_be/
+API_TESTING_GUIDE.md
+RAILWAY_DEPLOYMENT.md
