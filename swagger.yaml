@@ -280,6 +280,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/attendance/check-registration:
+    get:
+      tags:
+      - Attendance
+      summary: Check Registration
+      description: Mengecek apakah mahasiswa sudah mendaftarkan wajahnya atau belum.
+      operationId: check_registration_api_v1_attendance_check_registration_get
+      security:
+      - HTTPBearer: []
+      responses:
+        '200':
+          description: Berhasil mengecek status registrasi wajah
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response Check Registration Api V1 Attendance Check Registration Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/tasks:
     get:
       tags:
