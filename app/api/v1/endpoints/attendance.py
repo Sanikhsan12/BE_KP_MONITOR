@@ -93,3 +93,16 @@ async def get_attendances(
         })
         
     return {"status": "success", "data": formatted_data}
+
+@router.get("/check-registration", response_model=dict, responses={
+    200: {"description": "Berhasil mengecek status registrasi wajah"}
+})
+async def check_registration(
+    current_user=Depends(require_mahasiswa),
+    attendance_service: AttendanceService = Depends(get_attendance_service)
+):
+    """
+    Mengecek apakah mahasiswa sudah mendaftarkan wajahnya atau belum.
+    """
+    is_registered = await attendance_service.is_face_registered(current_user["sub"])
+    return {"status": "success", "data": {"is_registered": is_registered}}

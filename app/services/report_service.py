@@ -25,7 +25,18 @@ class ReportService:
         )
         await self.report_repo.create_daily_report(new_report)
         await self.report_repo.commit()
-        return {"id": str(new_report.id), "message": "Laporan harian berhasil dibuat"}
+        
+        return DailyReportResponse(
+            id=str(new_report.id),
+            task_id=str(new_report.task_id) if new_report.task_id else None,
+            mahasiswa_id=str(new_report.mahasiswa_id),
+            activity=new_report.activity,
+            obstacle=new_report.obstacle,
+            tomorrow_plan=new_report.tomorrow_plan,
+            report_date=new_report.report_date,
+            send_status=new_report.send_status,
+            submitted_at=new_report.submitted_at
+        ).dict()
 
     async def get_daily_reports(self, mahasiswa_id: str, date_filter: str = None) -> list:
         # Default rentang dinamis H-3 sampai H+3
@@ -87,7 +98,19 @@ class ReportService:
         
         await self.report_repo.create_weekly_report(new_report)
         await self.report_repo.commit()
-        return {"id": str(new_report.id), "message": "Laporan mingguan berhasil diunggah"}
+        
+        return WeeklyReportResponse(
+            id=str(new_report.id),
+            mahasiswa_id=str(new_report.mahasiswa_id),
+            week_number=new_report.week_number,
+            year=new_report.year,
+            file_url=new_report.file_url,
+            notes=new_report.notes,
+            status=new_report.status,
+            submitted_at=new_report.submitted_at,
+            reviewed_at=new_report.reviewed_at,
+            reviewed_by=str(new_report.reviewed_by) if new_report.reviewed_by else None
+        ).dict()
 
     async def get_weekly_reports(self, mahasiswa_id: str, date_filter: str = None) -> list:
         reports = await self.report_repo.get_weekly_reports(mahasiswa_id)

@@ -84,3 +84,7 @@ class AttendanceService:
         if not date:
             date = datetime.now().strftime("%Y-%m-%d")
         return await self.attendance_repo.get_attendance_by_date(mahasiswa_id, date)
+
+    async def is_face_registered(self, mahasiswa_id: str) -> bool:
+        existing_vector = await self.attendance_repo.get_face_vector(mahasiswa_id)
+        return existing_vector is not None

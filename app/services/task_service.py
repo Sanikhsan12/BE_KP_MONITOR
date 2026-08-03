@@ -72,7 +72,20 @@ class TaskService:
             await self.task_repo.add_task_photo(new_photo)
 
         await self.task_repo.commit()
-        return {"id": str(task_id), "title": new_task.title}
+        
+        return TaskResponse(
+            id=str(task_id),
+            mahasiswa_id=str(new_task.mahasiswa_id),
+            title=new_task.title,
+            description=new_task.description,
+            status=new_task.status,
+            task_date=new_task.task_date,
+            is_verified=new_task.is_verified,
+            created_at=new_task.created_at,
+            updated_at=new_task.updated_at,
+            photos=[TaskPhotoSchema(id=str(new_photo.id), photo_url=new_photo.photo_url, uploaded_at=new_photo.uploaded_at)] if file else [],
+            notes=[]
+        ).dict()
 
     async def update_task(self, mahasiswa_id: str, task_id: str, req: TaskUpdateRequest) -> dict:
         task = await self.task_repo.get_task_by_id(task_id, mahasiswa_id)
