@@ -32,6 +32,14 @@ class UserRepository:
     async def create_mentor_profile(self, profile: MentorProfile):
         self.session.add(profile)
 
+    async def get_mahasiswa_profile(self, user_id: str) -> Optional[MahasiswaProfile]:
+        res = await self.session.execute(select(MahasiswaProfile).where(MahasiswaProfile.user_id == user_id))
+        return res.scalars().first()
+
+    async def get_mentor_profile(self, user_id: str) -> Optional[MentorProfile]:
+        res = await self.session.execute(select(MentorProfile).where(MentorProfile.user_id == user_id))
+        return res.scalars().first()
+        
     async def get_full_user_profile(self, user_id: str):
         result = await self.session.execute(select(User).where(User.id == user_id))
         user = result.scalars().first()
