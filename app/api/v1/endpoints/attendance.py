@@ -48,7 +48,17 @@ async def check_in(
     """
     image_bytes = await file.read()
     att = await attendance_service.check_in(current_user["sub"], image_bytes)
-    return {"status": "success", "data": {"id": str(att.id), "date": att.date, "type": att.type}}
+    return {
+        "status": "success", 
+        "data": {
+            "id": str(att.id), 
+            "mahasiswa_id": str(att.mahasiswa_id),
+            "type": att.type,
+            "timestamp": att.timestamp,
+            "date": att.date,
+            "face_verified": 1 if att.face_verified else 0
+        }
+    }
 
 @router.post("/check-out", response_model=dict, responses={
     200: {"description": "Absensi pulang berhasil"},
@@ -64,7 +74,17 @@ async def check_out(
     """
     image_bytes = await file.read()
     att = await attendance_service.check_out(current_user["sub"], image_bytes)
-    return {"status": "success", "data": {"id": str(att.id), "date": att.date, "type": att.type}}
+    return {
+        "status": "success", 
+        "data": {
+            "id": str(att.id), 
+            "mahasiswa_id": str(att.mahasiswa_id),
+            "type": att.type,
+            "timestamp": att.timestamp,
+            "date": att.date,
+            "face_verified": 1 if att.face_verified else 0
+        }
+    }
 
 @router.get("", response_model=dict, responses={
     200: {"description": "Berhasil mendapatkan data absensi"}

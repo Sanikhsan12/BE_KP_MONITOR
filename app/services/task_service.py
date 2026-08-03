@@ -101,7 +101,24 @@ class TaskService:
         await self.task_repo.update_task(task)
         await self.task_repo.commit()
         
-        return {"id": str(task.id), "message": "Tugas berhasil diperbarui"}
+        photos = await self.task_repo.get_task_photos(task.id)
+        notes = await self.task_repo.get_task_progress_notes(task.id)
+        photo_schemas = [TaskPhotoSchema(id=str(p.id), photo_url=p.photo_url, uploaded_at=p.uploaded_at) for p in photos]
+        note_schemas = [TaskProgressNoteSchema(id=str(n.id), note=n.note, created_at=n.created_at) for n in notes]
+
+        return TaskResponse(
+            id=str(task.id),
+            mahasiswa_id=str(task.mahasiswa_id),
+            title=task.title,
+            description=task.description,
+            status=task.status,
+            task_date=task.task_date,
+            is_verified=task.is_verified,
+            created_at=task.created_at,
+            updated_at=task.updated_at,
+            photos=photo_schemas,
+            notes=note_schemas
+        ).dict()
 
     async def add_progress_note(self, mahasiswa_id: str, task_id: str, note: str) -> dict:
         task = await self.task_repo.get_task_by_id(task_id, mahasiswa_id)

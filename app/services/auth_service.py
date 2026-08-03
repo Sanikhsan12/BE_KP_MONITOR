@@ -82,14 +82,35 @@ class AuthService:
 
         access_token = create_access_token(data={"sub": str(user.id), "role": user.role})
         
+        user_data = {
+            "id": str(user.id),
+            "name": user.name,
+            "email": user.email,
+            "role": user.role
+        }
+
+        if user.role == "mahasiswa":
+            m_profile = await self.user_repo.get_mahasiswa_profile(user.id)
+            if m_profile:
+                user_data["mahasiswa_profile"] = {
+                    "nim": m_profile.nim,
+                    "universitas": m_profile.universitas,
+                    "divisi": m_profile.divisi,
+                    "periode_mulai": m_profile.periode_mulai,
+                    "periode_selesai": m_profile.periode_selesai
+                }
+        elif user.role == "mentor":
+            m_profile = await self.user_repo.get_mentor_profile(user.id)
+            if m_profile:
+                user_data["mentor_profile"] = {
+                    "nik": m_profile.nik,
+                    "divisi": m_profile.divisi,
+                    "jabatan": m_profile.jabatan
+                }
+
         return {
             "access_token": access_token,
             "token_type": "bearer",
             "expires_in": settings.access_token_expire_minutes * 60,
-            "user": {
-                "id": str(user.id),
-                "name": user.name,
-                "email": user.email,
-                "role": user.role
-            }
+            "user": user_data
         }
